@@ -1,0 +1,15 @@
+{
+  "name": "synclab",
+  "version": "1.0.0",
+  "description": "Narracao com legenda sincronizada, transparente e com autoplay, para colar no Genially",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node testes/executar.mjs",
+    "testar:navegador": "node testes/navegador.mjs",
+    "iniciar": "python3 -m http.server 8000 --directory src"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

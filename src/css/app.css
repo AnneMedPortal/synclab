@@ -1,0 +1,206 @@
+/* SyncLab - interface de autoria.
+   Este CSS e da ferramenta. O CSS da legenda exportada vive em js/aparencia.js
+   e e o mesmo usado na pre-visualizacao. */
+
+:root {
+  --fundo: #0f1621;
+  --fundo-cartao: #17202e;
+  --fundo-campo: #0d141d;
+  --borda: #27354a;
+  --texto: #e8eef6;
+  --texto-suave: #9fb0c6;
+  --destaque: #3ba9f5;
+  --destaque-escuro: #1b7fc4;
+  --ok: #35c46a;
+  --erro: #ff6b6b;
+  --alerta: #ffc44d;
+  --raio: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+h1 { font-size: 22px; margin: 0; letter-spacing: .3px; }
+h2 { font-size: 17px; margin: 0 0 14px; color: var(--destaque); }
+h3 { font-size: 15px; margin: 22px 0 8px; }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .92em; color: #b8d8f5; }
+
+/* ---------------------------------------------------------------- topo */
+.topo {
+  display: flex; flex-wrap: wrap; gap: 16px; align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #101825;
+  border-bottom: 1px solid var(--borda);
+  position: sticky; top: 0; z-index: 50;
+}
+.topo-marca p { margin: 2px 0 0; color: var(--texto-suave); font-size: 13px; }
+.topo-estado { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.pastilha {
+  font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--borda); white-space: nowrap;
+}
+.pastilha-neutra { color: var(--texto-suave); }
+.pastilha-ok { color: var(--ok); border-color: var(--ok); }
+.pastilha-erro { color: var(--erro); border-color: var(--erro); }
+
+.atalhos {
+  display: flex; gap: 4px; flex-wrap: wrap;
+  padding: 10px 24px; border-bottom: 1px solid var(--borda);
+  background: #0c1420;
+}
+.atalhos a {
+  color: var(--texto-suave); text-decoration: none; font-size: 13px;
+  padding: 4px 10px; border-radius: 6px;
+}
+.atalhos a:hover { background: #1b2534; color: var(--texto); }
+
+main { max-width: 1080px; margin: 0 auto; padding: 24px; }
+
+/* ------------------------------------------------------------- cartoes */
+.cartao {
+  background: var(--fundo-cartao);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 20px 22px;
+  margin-bottom: 22px;
+  scroll-margin-top: 90px;
+}
+
+.ajuda { color: var(--texto-suave); font-size: 13px; margin: 6px 0 14px; }
+.vazio { color: var(--texto-suave); font-size: 13px; font-style: italic; }
+.oculto { display: none !important; }
+
+/* -------------------------------------------------------------- campos */
+.linha { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+.campo { display: flex; flex-direction: column; gap: 5px; flex: 1 1 200px; min-width: 0; }
+.campo-largo { flex: 3 1 340px; }
+.campo-botao { flex: 0 0 auto; justify-content: flex-end; }
+.campo-cor { flex: 0 0 150px; }
+.campo > span { font-size: 12px; color: var(--texto-suave); }
+.campo > span em { color: #7d8fa6; }
+
+input[type="text"], input[type="password"], input[type="number"],
+select, textarea {
+  background: var(--fundo-campo);
+  color: var(--texto);
+  border: 1px solid var(--borda);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font: inherit;
+  width: 100%;
+}
+textarea { resize: vertical; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--destaque); outline-offset: 1px; border-color: var(--destaque);
+}
+input[readonly] { color: var(--texto-suave); }
+input[type="color"] { padding: 2px; height: 38px; cursor: pointer; }
+input[type="range"] { padding: 0; accent-color: var(--destaque); }
+input[type="file"] { padding: 6px; font-size: 13px; }
+input:disabled, select:disabled, textarea:disabled, button:disabled {
+  opacity: .5; cursor: not-allowed;
+}
+
+.marcador {
+  display: flex; gap: 9px; align-items: flex-start;
+  font-size: 13px; color: var(--texto-suave);
+  margin: 8px 0 12px; cursor: pointer;
+}
+.marcador input { margin-top: 3px; accent-color: var(--destaque); flex: 0 0 auto; }
+.marcador strong { color: var(--alerta); }
+
+/* ------------------------------------------------------------- botoes */
+button {
+  background: var(--destaque-escuro); color: #fff; border: 1px solid var(--destaque);
+  border-radius: 7px; padding: 9px 16px; font: inherit; font-weight: 600;
+  cursor: pointer;
+}
+button:hover:not(:disabled) { background: var(--destaque); }
+button.secundario { background: transparent; color: var(--destaque); }
+button.secundario:hover:not(:disabled) { background: #16283a; }
+button.grande { padding: 12px 24px; font-size: 15px; }
+.acoes { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+
+/* --------------------------------------------------------------- abas */
+.abas { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.aba {
+  background: transparent; color: var(--texto-suave);
+  border: 1px solid var(--borda); font-weight: 500;
+}
+.aba.ativa { background: #16283a; color: var(--destaque); border-color: var(--destaque); }
+
+/* ------------------------------------------------------------- avisos */
+.aviso {
+  border-radius: 8px; padding: 10px 13px; font-size: 13px;
+  margin: 12px 0; border: 1px solid var(--borda); background: #0d141d;
+  white-space: pre-wrap;
+}
+.aviso-ok { border-color: var(--ok); color: #b7f2cd; }
+.aviso-erro { border-color: var(--erro); color: #ffc9c9; }
+.aviso-alerta { border-color: var(--alerta); color: #ffe4ad; }
+
+/* ------------------------------------------------------------ tabelas */
+.tabela { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tabela th, .tabela td {
+  text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--borda);
+  vertical-align: top;
+}
+.tabela th { color: var(--texto-suave); font-weight: 600; font-size: 12px; }
+.tabela td.numerico { font-family: ui-monospace, Menlo, Consolas, monospace; white-space: nowrap; }
+.tabela tbody tr:hover { background: #1b2534; }
+.tabela tbody tr.ativa { background: #16354d; }
+.tabela-rolagem { max-height: 340px; overflow: auto; border: 1px solid var(--borda); border-radius: 8px; }
+.tabela .texto-bloco { white-space: pre-line; }
+.tabela button { padding: 3px 9px; font-size: 12px; }
+
+/* ------------------------------------------------------------- previa */
+.previa-moldura { border: 1px solid var(--borda); border-radius: 8px; overflow: hidden; }
+
+/* O xadrez confirma a transparencia: onde ha xadrez, o slide aparece. */
+.xadrez {
+  position: relative;
+  height: 340px;
+  background-color: #cfd6de;
+  background-image:
+    linear-gradient(45deg, #9aa4b1 25%, transparent 25%, transparent 75%, #9aa4b1 75%),
+    linear-gradient(45deg, #9aa4b1 25%, transparent 25%, transparent 75%, #9aa4b1 75%);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+
+.controles-previa {
+  display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin: 12px 0;
+}
+.controles-previa audio { flex: 1 1 320px; max-width: 100%; }
+.controles-previa .ajuda { margin: 0; }
+
+/* --------------------------------------------------------- notificacao */
+.notificacao {
+  position: fixed; right: 20px; bottom: 20px; z-index: 200;
+  background: #16283a; border: 1px solid var(--destaque);
+  color: var(--texto); padding: 12px 16px; border-radius: 8px;
+  max-width: min(420px, 90vw); font-size: 13px; white-space: pre-wrap;
+  box-shadow: 0 8px 28px rgba(0,0,0,.5);
+}
+.notificacao.erro { border-color: var(--erro); }
+.notificacao.ok { border-color: var(--ok); }
+
+.rodape {
+  max-width: 1080px; margin: 0 auto; padding: 0 24px 40px;
+  color: var(--texto-suave); font-size: 12px;
+}
+
+@media (max-width: 620px) {
+  main { padding: 14px; }
+  .cartao { padding: 16px; }
+  .topo { padding: 12px 14px; }
+  .atalhos { padding: 8px 14px; }
+}

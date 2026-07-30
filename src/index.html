@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SyncLab — narração e legenda sincronizada para o Genially</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f1621'/%3E%3Crect x='6' y='19' width='20' height='5' rx='2' fill='%233ba9f5'/%3E%3Crect x='9' y='9' width='14' height='3' rx='1.5' fill='%23e8eef6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-marca">
+    <h1>SyncLab</h1>
+    <p>Narração com legenda sincronizada, pronta para colar no Genially.</p>
+  </div>
+  <div class="topo-estado">
+    <span id="estado-conexao" class="pastilha pastilha-neutra">Sem conexão</span>
+    <span id="estado-legendas" class="pastilha pastilha-neutra">Sem legenda</span>
+    <span id="estado-audio" class="pastilha pastilha-neutra">Sem áudio</span>
+  </div>
+</header>
+
+<nav class="atalhos" aria-label="Seções">
+  <a href="#sec-conexao">1. Conexão</a>
+  <a href="#sec-narracao">2. Narração</a>
+  <a href="#sec-legenda">3. Legenda</a>
+  <a href="#sec-dicionario">4. Dicionário</a>
+  <a href="#sec-regras">5. Segmentação</a>
+  <a href="#sec-aparencia">6. Aparência</a>
+  <a href="#sec-previa">7. Prévia</a>
+  <a href="#sec-saida">8. Saída</a>
+  <a href="#sec-s3">9. S3</a>
+</nav>
+
+<main>
+
+<!-- ================================================================= -->
+<section class="cartao" id="sec-conexao">
+  <h2>1. Conexão com a ElevenLabs</h2>
+  <p class="ajuda">
+    A chave é usada direto do seu navegador para a ElevenLabs. Nada passa por
+    servidor intermediário. Espaços e caracteres invisíveis colados junto são
+    removidos automaticamente.
+  </p>
+
+  <div class="linha">
+    <label class="campo campo-largo">
+      <span>Chave de API (<code>xi-api-key</code>)</span>
+      <input type="password" id="chave-api" autocomplete="off" spellcheck="false"
+             placeholder="sk_...">
+    </label>
+    <label class="campo campo-botao">
+      <span>&nbsp;</span>
+      <button type="button" id="btn-mostrar-chave" class="secundario">Mostrar</button>
+    </label>
+    <label class="campo campo-botao">
+      <span>&nbsp;</span>
+      <button type="button" id="btn-conectar">Conectar e buscar vozes</button>
+    </label>
+  </div>
+
+  <label class="marcador">
+    <input type="checkbox" id="lembrar-credenciais">
+    <span>
+      Lembrar chave e credenciais neste navegador.
+      <strong>Atenção:</strong> só marque em um computador de uso pessoal — os
+      valores ficam salvos no armazenamento local, em texto legível.
+    </span>
+  </label>
+
+  <div class="linha">
+    <label class="campo">
+      <span>Voz</span>
+      <select id="voz" disabled><option>Conecte para carregar as vozes</option></select>
+    </label>
+    <label class="campo">
+      <span>Modelo</span>
+      <select id="modelo" disabled><option>Conecte para carregar os modelos</option></select>
+    </label>
+  </div>
+  <p class="ajuda" id="nota-modelo"></p>
+  <div class="linha">
+    <label class="campo">
+      <span>Voice ID selecionado</span>
+      <input type="text" id="voz-id" readonly placeholder="—">
+    </label>
+    <label class="campo">
+      <span>Velocidade</span>
+      <input type="number" id="velocidade" min="0.7" max="1.2" step="0.05" value="1">
+    </label>
+  </div>
+
+  <div id="aviso-conexao" class="aviso oculto"></div>
+</section>
+
+<!-- ================================================================= -->
+<section class="cartao" id="sec-narracao">
+  <h2>2. Narração e nome dos arquivos</h2>
+
+  <label class="campo">
+    <span>Nome-base dos arquivos <em>(definido antes de gerar)</em></span>
+    <input type="text" id="nome-base" placeholder="aula-03-infarto" value="narracao">
+  </label>
+  <p class="ajuda">
+    Vira <code id="previa-nomes">narracao.html / narracao.mp3 / narracao.srt / narracao.vtt / narracao.zip</code>.
+    Acentos são removidos, espaços viram hífen e tudo fica em minúsculas — o
+    mesmo nome vale para as chaves no S3.
+  </p>
+
+  <label class="campo">
+    <span>Texto da narração</span>
+    <textarea id="texto" rows="9" placeholder="Cole aqui o texto que a voz vai narrar."></textarea>
+  </label>
+  <p class="ajuda"><span id="contagem-texto">0 caracteres</span></p>
+</section>
+
+<!-- ================================================================= -->
+<section class="cartao" id="sec-legenda">
+  <h2>3. Origem da legenda</h2>
+
+  <div class="abas" role="tablist">
+    <button type="button" class="aba ativa" data-origem="texto" role="tab">Texto → ElevenLabs</button>
+    <button type="button" class="aba" data-origem="arquivos" role="tab">Áudio + SRT/VTT prontos</button>
+    <button type="button" class="aba" data-origem="transcricao" role="tab">Só o áudio (Scribe)</button>
+  </div>
+
+  <div class="painel-origem" data-painel="texto">
+    <p class="ajuda">
+      Gera áudio e legenda na mesma chamada, usando o endpoint que devolve o
+      instante de cada caractere falado. É a sincronia mais precisa possível,
+      porque não há transcrição no meio do caminho.
+    </p>
+    <button type="button" id="btn-gerar" class="grande">Gerar áudio e legenda</button>
+  </div>
+
+  <div class="painel-origem oculto" data-painel="arquivos">
+    <p class="ajuda">Importa arquivos que você já tem prontos.</p>
+    <div class="linha">
+      <label class="campo">
+        <span>Arquivo de áudio (MP3)</span>
+        <input type="file" id="arq-audio" accept="audio/*">
+      </label>
+      <label class="campo">
+        <span>Legenda (.srt ou .vtt)</span>
+        <input type="file" id="arq-legenda" accept=".srt,.vtt,text/vtt,application/x-subrip">
+      </label>
+    </div>
+    <button type="button" id="btn-importar">Importar arquivos</button>
+  </div>
+
+  <div class="painel-origem oculto" data-painel="transcricao">
+    <p class="ajuda">
+      Transcreve um áudio existente pelo Scribe, com timestamp por palavra.
+      Requer a chave de API conectada.
+    </p>
+    <div class="linha">
+      <label class="campo">
+        <span>Arquivo de áudio</span>
+        <input type="file" id="arq-audio-transcrever" accept="audio/*">
+      </label>
+      <label class="campo">
+        <span>Idioma (opcional)</span>
+        <input type="text" id="idioma-scribe" placeholder="por" value="por">
+      </label>
+    </div>
+    <button type="button" id="btn-transcrever">Transcrever com o Scribe</button>
+  </div>
+
+  <div id="aviso-legenda" class="aviso oculto"></div>
+</section>
+
+<!-- ================================================================= -->
+<section class="cartao" id="sec-dicionario">
+  <h2>4. Dicionário de pronúncia</h2>
+  <p class="ajuda">
+    Para siglas e jargão médico que a voz lê errado. O dicionário é salvo na sua
+    conta da ElevenLabs e aplicado nas gerações seguintes.
+    <strong>A chave de API precisa ter a permissão de escrita de dicionário
+    habilitada</strong> — sem ela a criação falha, e o erro exato aparece aqui.
+  </p>
+
+  <div class="linha linha-regra">
+    <label class="campo">
+      <span>Termo que a voz erra</span>
+      <input type="text" id="regra-termo" placeholder="IAM">
+    </label>
+    <label class="campo">
+      <span>Tipo de regra</span>
+      <select id="regra-tipo">
+        <option value="substituicao">Substituição de grafia</option>
+        <option value="fonema">Fonema (IPA)</option>
+      </select>
+    </label>
+    <label class="campo">
+      <span id="rotulo-regra-valor">Como deve ser lido</span>
+      <input type="text" id="regra-valor" placeholder="infarto agudo do miocárdio">
+    </label>
+    <label class="campo campo-botao">
+      <span>&nbsp;</span>
+      <button type="button" id="btn-add-regra" class="secundario">Adicionar</button>
+    </label>
+  </div>
+  <p class="ajuda" id="dica-regra">
+    Substituição troca a escrita antes da síntese. Fonema força a pronúncia em
+    IPA e só funciona em alguns modelos — se a voz ignorar, use substituição.
+  </p>
+
+  <table class="tabela" id="tabela-regras">
+    <thead><tr><th>Termo</th><th>Tipo</th><th>Valor</th><th></th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <p class="vazio" id="regras-vazio">Nenhuma regra cadastrada.</p>
+
+  <div class="linha">
+    <label class="campo">
+      <span>Nome do dicionário na ElevenLabs</span>
+      <input type="text" id="dicionario-nome" placeholder="synclab-medportal" value="synclab">
+    </label>
+    <label class="campo campo-botao">
+      <span>&nbsp;</span>
+      <button type="button" id="btn-salvar-dicionario">Salvar na conta ElevenLabs</button>
+    </label>
+  </div>
+
+  <label class="marcador">
+    <input type="checkbox" id="aplicar-dicionario" checked>
+    <span>Aplicar este dicionário nas próximas gerações</span>
+  </label>
+
+  <div id="estado-dicionario" class="aviso oculto"></div>
+</section>
+
+<!-- ================================================================= -->
+<section class="cartao" id="sec-regras">
+  <h2>5. Regras de segmentação</h2>
+
+  <div class="linha">
+    <label class="campo">
+      <span>Máximo de caracteres por linha</span>
+      <input type="number" id="max-caracteres" min="8" max="120" step="1" value="42">
+    </label>
+    <label class="campo">
+      <span>Máximo de linhas por legenda</span>
+      <input type="number" id="max-linhas" min="1" max="4" step="1" value="2">
+    </label>
+    <label class="campo">
+      <span>Pausa mínima para quebrar (segundos)</span>
+      <input type="number" id="pausa-minima" min="0" max="3" step="0.05" value="0.35">
+    </label>
+  </div>
+
+  <label class="marcador">
+    <input type="checkbox" id="quebrar-frase" checked>
+    <span>Quebrar em novo bloco no fim de frase</span>
+  </label>
+
+  <button type="button" id="btn-reaplicar" class="secundario">
+    Reaplicar regras (sem regerar o áudio)
+  </button>
+  <p class="ajuda">
+    Reaplica a segmentação sobre os tempos já existentes. O áudio não é gerado
+    de novo, então não consome créditos da ElevenLabs.
+  </p>
+</section>
+
+<!-- ================================================================= -->
+<section class="cartao" id="sec-aparencia">
+  <h2>6. Aparência da legenda</h2>
+
+  <div class="linha">
+    <label class="campo">
+      <span>Fonte</span>
+      <select id="ap-fonte"></select>
+    </label>
+    <label class="campo">
+      <span>Tamanho (px)</span>
+      <input type="number" id="ap-tamanho" min="8" max="200" step="1" value="32">
+    </label>
+    <label class="campo">
+      <span>Peso</span>
+      <select id="ap-peso">
+        <option value="300">Leve (300)</option>
+        <option value="400">Normal (400)</option>
+        <option value="600">Semi-negrito (600)</option>
+        <option value="700" selected>Negrito (700)</option>
+        <option value="900">Extra (900)</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="linha">
+    <label class="campo campo-cor">
+      <span>Cor da letra</span>
+      <input type="color" id="ap-cor-texto" value="#FFFFFF">
+    </label>
+    <label class="campo campo-cor">
+      <span>Cor da tarja</span>
+      <input type="color" id="ap-cor-tarja" value="#000000">
+    </label>
+    <label class="campo">
+      <span>Opacidade da tarja (<span id="ap-opacidade-valor">75</span>%)</span>
+      <input type="range" id="ap-opacidade" min="0" max="100" step="1" value="75">
+    </label>
+  </div>
+
+  <label class="marcador">
+    <input type="checkbox" id="ap-mostrar-tarja" checked>
+    <span>Mostrar tarja atrás do texto</span>
+  </label>
+  <label class="marcador">
+    <input type="checkbox" id="ap-contorno" checked>
+    <span>Contorno escuro no texto (mantém a leitura quando a tarja é removida)</span>
+  </label>
+
+  <div class="linha">
+    <label class="campo">
+      <span>Posição vertical</span>
+      <select id="ap-posicao">
+        <option value="topo">Topo</option>
+        <option value="centro">Centro</option>
+        <option value="base" selected>Base</option>
+      </select>
+    </label>
+    <label class="campo">
+      <span>Distância da borda (px)</span>
+      <input type="number" id="ap-distancia" min="0" max="600" step="1" value="48">
+    </label>
+    <label class="campo">
+      <span>Alinhamento horizontal</span>
+      <select id="ap-alinhamento">
+        <option value="esquerda">Esquerda</option>
+        <option value="centro" selected>Centro</option>
+        <option value="direita">Direita</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="linha">
+    <label class="campo">
+      <span>Recuo interno horizontal (px)</span>
+      <input type="number" id="ap-recuo-h" min="0" max="200" step="1" value="18">
+    </label>
+    <label class="campo">
+      <span>Recuo interno vertical (px)</span>
+      <input type="number" id="ap-recuo-v" min="0" max="200" step="1" value="10">
+    </label>
+    <label class="campo">
+      <span>Arredondamento (px)</span>
+      <input type="number" id="ap-raio" min="0" max="100" step="1" value="8">
+    </label>
+    <label class="campo">
+      <span>Entrelinha</span>
+      <input type="number" id="ap-entrelinha" min="0.8" max="3" step="0.05" value="1.25">
+    </label>
+  </div>
+
+  <div class="linha">
+    <label class="campo">
+      <span>Ancoragem no slide</span>
+      <select id="ap-ancoragem">
+        <option value="fixed" selected>Fixa na tela (recomendado no Genially)</option>
+        <option value="absolute">Dentro do elemento que recebe o trecho</option>
+        <option value="estatico">No fluxo da página</option>
+      </select>
+    </label>
+    <label class="campo">
+      <span>Largura máxima da caixa (% da tela)</span>
+      <input type="number" id="ap-largura" min="10" max="100" step="1" value="90">
+    </label>
+  </div>
+  <p class="ajuda">
+    A caixa usa <code>width: max-content</code>: ela abraça o texto e nunca vira
+    uma faixa da largura toda. O fundo em volta é sempre transparente.
+  </p>
+</section>
+
+<!-- ================================================================= -->
+<section class="cartao" id="sec-previa">
+  <h2>7. Pré-visualização</h2>
+  <p class="ajuda">
+    O fundo xadrez confirma a transparência: o que você vê como xadrez, o aluno
+    vê como o slide do Genially. Este player existe só aqui — no HTML exportado
+    não há player, botão ou controle algum.
+  </p>
+
+  <div class="previa-moldura">
+    <div class="xadrez" id="palco-previa">
+      <div id="previa-raiz" class="previa-raiz">
+        <div id="previa-caixa" class="previa-caixa" data-visivel="0"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controles-previa">
+    <audio id="previa-audio" controls preload="metadata"></audio>
+    <span id="previa-info" class="ajuda">Nenhum áudio carregado.</span>
+  </div>
+
+  <h3>Blocos de legenda</h3>
+  <p class="ajuda" id="resumo-blocos">—</p>
+  <div class="tabela-rolagem">
+    <table class="tabela" id="tabela-blocos">
+      <thead><tr><th>#</th><th>Início</th><th>Fim</th><th>Duração</th><th>Texto</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="vazio" id="blocos-vazio">Nenhum bloco gerado ainda.</p>
+</section>
+
+<!-- ================================================================= -->
+<section class="cartao" id="sec-saida">
+  <h2>8. Saída</h2>
+
+  <div class="linha">
+    <label class="campo">
+      <span>Origem do áudio no HTML</span>
+      <select id="modo-audio">
+        <option value="embutido" selected>Embutido no HTML (padrão)</option>
+        <option value="url">URL externa</option>
+      </select>
+    </label>
+    <label class="campo campo-largo">
+      <span>URL externa do áudio</span>
+      <input type="text" id="url-audio" placeholder="https://meu-bucket.s3.sa-east-1.amazonaws.com/narracao.mp3" disabled>
+    </label>
+    <label class="campo campo-botao">
+      <span>&nbsp;</span>
+      <button type="button" id="btn-testar-url" class="secundario" disabled>Testar URL</button>
+    </label>
+  </div>
+  <div id="resultado-url" class="aviso oculto"></div>
+
+  <label class="marcador">
+    <input type="checkbox" id="incluir-diagnostico">
+    <span>
+      Incluir o painel de diagnóstico no HTML.
+      <strong>Desligue para a versão final do aluno.</strong>
+    </span>
+  </label>
+
+  <h3>Trecho inline (sem iframe)</h3>
+  <p class="ajuda">
+    É o formato que resolve o autoplay: rodando no mesmo documento do slide, o
+    script enxerga os gestos do aluno. Cole num elemento de HTML do Genially.
+  </p>
+  <div class="acoes">
+    <button type="button" id="btn-gerar-saida">Gerar saída</button>
+    <button type="button" id="btn-copiar" class="secundario" disabled>Copiar trecho</button>
+    <button type="button" id="btn-baixar-par" disabled>Baixar HTML + MP3 (o par)</button>
+    <button type="button" id="btn-baixar-zip" class="secundario" disabled>Baixar pacote .zip</button>
+  </div>
+  <div class="acoes">
+    <button type="button" id="btn-baixar-doc" class="secundario" disabled>HTML completo</button>
+    <button type="button" id="btn-baixar-srt" class="secundario" disabled>SRT</button>
+    <button type="button" id="btn-baixar-vtt" class="secundario" disabled>VTT</button>
+    <button type="button" id="btn-baixar-mp3" class="secundario" disabled>MP3</button>
+  </div>
+  <p class="ajuda" id="info-saida">—</p>
+
+  <label class="campo">
+    <span>Trecho gerado</span>
+    <textarea id="saida-trecho" rows="10" readonly spellcheck="false"
+              placeholder="Gere a saída para ver o trecho aqui."></textarea>
+  </label>
+  <div id="aviso-saida" class="aviso oculto"></div>
+</section>
+
+<!-- ================================================================= -->
+<section class="cartao" id="sec-s3">
+  <h2>9. Hospedagem no S3</h2>
+  <p class="ajuda">
+    Envio direto do navegador, assinado com AWS SigV4. Os objetos vão com
+    <code>Cache-Control: no-store</code>, para que republicar apareça atualizado
+    na hora. O bucket precisa de uma regra de CORS permitindo <code>PUT</code> e
+    o cabeçalho <code>Authorization</code> para a origem onde o SyncLab é aberto.
+  </p>
+
+  <div class="linha">
+    <label class="campo">
+      <span>Bucket</span>
+      <input type="text" id="s3-bucket" placeholder="meus-audios" autocomplete="off">
+    </label>
+    <label class="campo">
+      <span>Região</span>
+      <input type="text" id="s3-regiao" placeholder="sa-east-1" value="sa-east-1" autocomplete="off">
+    </label>
+    <label class="campo">
+      <span>Prefixo/pasta (opcional)</span>
+      <input type="text" id="s3-prefixo" placeholder="aulas/cardiologia" autocomplete="off">
+    </label>
+  </div>
+
+  <div class="linha">
+    <label class="campo">
+      <span>Access Key ID</span>
+      <input type="password" id="s3-chave" autocomplete="off" spellcheck="false">
+    </label>
+    <label class="campo">
+      <span>Secret Access Key</span>
+      <input type="password" id="s3-segredo" autocomplete="off" spellcheck="false">
+    </label>
+    <label class="campo">
+      <span>Token de sessão (opcional)</span>
+      <input type="password" id="s3-token" autocomplete="off" spellcheck="false">
+    </label>
+  </div>
+
+  <label class="marcador">
+    <input type="checkbox" id="s3-publico">
+    <span>
+      Enviar com ACL <code>public-read</code>. Deixe desmarcado se o bucket usa
+      política de leitura pública ou bloqueia ACLs (o padrão em buckets novos).
+    </span>
+  </label>
+
+  <div class="acoes">
+    <button type="button" id="btn-enviar-audio">Enviar MP3</button>
+    <button type="button" id="btn-enviar-html" class="secundario">Enviar HTML</button>
+    <button type="button" id="btn-enviar-tudo" class="secundario">Enviar MP3 + HTML + legendas</button>
+  </div>
+
+  <label class="campo">
+    <span>Link público gerado</span>
+    <input type="text" id="s3-link" readonly placeholder="—">
+  </label>
+  <div class="acoes">
+    <button type="button" id="btn-copiar-link" class="secundario" disabled>Copiar link</button>
+    <button type="button" id="btn-usar-link" class="secundario" disabled>Usar como URL do áudio</button>
+  </div>
+
+  <div id="estado-s3" class="aviso oculto"></div>
+</section>
+
+</main>
+
+<footer class="rodape">
+  <p>
+    SyncLab roda inteiro no navegador. Chaves e credenciais não saem daqui
+    para nenhum servidor além da ElevenLabs e da AWS.
+  </p>
+</footer>
+
+<div id="notificacao" class="notificacao oculto" role="status" aria-live="polite"></div>
+<style id="estilo-previa"></style>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
