@@ -40,6 +40,11 @@ a chave de API e as credenciais da AWS são digitadas na hora, ficam apenas no
 seu navegador e vão direto para a ElevenLabs e para a AWS. Não há segredo
 algum no código.
 
+Documento de apoio, no mesmo endereço:
+[**como levar isto para dentro do Genially**](https://annemedportal.github.io/synclab/genially.html)
+(`src/genially.html`) — o que a IA do Genially faz, o que ela não faz, por que o
+áudio nativo da plataforma não atende ao autoplay, e o passo a passo até o slide.
+
 Há também uma cópia em arquivo único em
 `https://annemedportal.github.io/synclab/synclab-arquivo-unico.html`, para
 baixar e usar offline.

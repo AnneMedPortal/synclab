@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SyncLab no Genially — o que a IA do Genially faz, o que não faz, e o caminho que funciona</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230F1621'/%3E%3Crect x='6' y='19' width='20' height='5' rx='2' fill='%234CA8FF'/%3E%3Crect x='9' y='9' width='14' height='3' rx='1.5' fill='%23E6EDF5'/%3E%3C/svg%3E">
+<style>
+/* Mesma identidade do SyncLab (tokens de src/css/app.css), em tratamento de
+   documento: coluna de leitura, medida curta, hierarquia tipográfica. */
+
+:root {
+  color-scheme: dark;
+
+  --fundo:            #0B0F14;
+  --superficie:       #121821;
+  --superficie-alta:  #18202B;
+  --superficie-baixa: #0D131A;
+
+  --borda:       #212B38;
+  --borda-forte: #313E4E;
+
+  --texto:       #E6EDF5;
+  --texto-suave: #93A1B3;
+  --texto-fraco: #66748A;
+
+  --acento:       #4CA8FF;
+  --acento-fraco: rgba(76, 168, 255, .12);
+  --acento-texto: #06101A;
+  --anel:         rgba(76, 168, 255, .38);
+
+  --ok:        #3DD68C;
+  --ok-bg:     rgba(61, 214, 140, .10);
+  --alerta:    #F5B44C;
+  --alerta-bg: rgba(245, 180, 76, .10);
+  --erro:      #FF7B72;
+  --erro-bg:   rgba(255, 123, 114, .10);
+
+  --sombra-1: 0 1px 2px rgba(0, 0, 0, .34);
+  --sombra-2: 0 4px 16px rgba(0, 0, 0, .34);
+
+  --e1: 4px;  --e2: 8px;  --e3: 12px; --e4: 16px;
+  --e5: 24px; --e6: 32px; --e7: 44px; --e8: 64px;
+
+  --raio-p: 6px;
+  --raio:   10px;
+  --raio-g: 14px;
+
+  --fonte: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+           "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", "SF Mono", ui-monospace, SFMono-Regular, Menlo,
+          Consolas, "Liberation Mono", monospace;
+
+  --medida: 68ch;
+  --coluna: 780px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --fundo:            #F1F4F8;
+    --superficie:       #FFFFFF;
+    --superficie-alta:  #FFFFFF;
+    --superficie-baixa: #F7F9FB;
+    --borda:       #E2E7ED;
+    --borda-forte: #C6D0DA;
+    --texto:       #131C27;
+    --texto-suave: #55647A;
+    --texto-fraco: #7C8CA1;
+    --acento:       #0B6FD4;
+    --acento-fraco: rgba(11, 111, 212, .09);
+    --acento-texto: #FFFFFF;
+    --anel:         rgba(11, 111, 212, .30);
+    --ok:        #0F7A4A;
+    --ok-bg:     rgba(15, 122, 74, .09);
+    --alerta:    #8A5A00;
+    --alerta-bg: rgba(138, 90, 0, .10);
+    --erro:      #C1352A;
+    --erro-bg:   rgba(193, 53, 42, .09);
+    --sombra-1: 0 1px 2px rgba(16, 30, 48, .07);
+    --sombra-2: 0 4px 16px rgba(16, 30, 48, .09);
+  }
+}
+
+/* Duplicada de propósito: uma media query não divide bloco com um seletor de
+   atributo. Ao mexer numa, mexa na outra. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --fundo:            #F1F4F8;
+  --superficie:       #FFFFFF;
+  --superficie-alta:  #FFFFFF;
+  --superficie-baixa: #F7F9FB;
+  --borda:       #E2E7ED;
+  --borda-forte: #C6D0DA;
+  --texto:       #131C27;
+  --texto-suave: #55647A;
+  --texto-fraco: #7C8CA1;
+  --acento:       #0B6FD4;
+  --acento-fraco: rgba(11, 111, 212, .09);
+  --acento-texto: #FFFFFF;
+  --anel:         rgba(11, 111, 212, .30);
+  --ok:        #0F7A4A;
+  --ok-bg:     rgba(15, 122, 74, .09);
+  --alerta:    #8A5A00;
+  --alerta-bg: rgba(138, 90, 0, .10);
+  --erro:      #C1352A;
+  --erro-bg:   rgba(193, 53, 42, .09);
+  --sombra-1: 0 1px 2px rgba(16, 30, 48, .07);
+  --sombra-2: 0 4px 16px rgba(16, 30, 48, .09);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--fonte);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.pagina {
+  max-width: var(--coluna);
+  margin: 0 auto;
+  padding: var(--e8) var(--e5) var(--e8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e6);
+}
+
+/* ------------------------------------------------------------ tipografia */
+
+h1, h2, h3 { margin: 0; letter-spacing: -.02em; text-wrap: balance; }
+h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 700; line-height: 1.15; }
+h2 { font-size: clamp(20px, 3vw, 25px); font-weight: 650; line-height: 1.25; }
+h3 { font-size: 17px; font-weight: 650; }
+
+p, li { max-width: var(--medida); }
+p { margin: 0; }
+
+a { color: var(--acento); text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+
+strong { font-weight: 650; color: var(--texto); }
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--texto-fraco);
+}
+
+.subtitulo {
+  font-size: clamp(17px, 2.4vw, 19px);
+  color: var(--texto-suave);
+  max-width: var(--medida);
+}
+
+.secao { display: flex; flex-direction: column; gap: var(--e4); }
+.secao > p + p { margin-top: calc(var(--e1) * -1); }
+
+code {
+  font-family: var(--mono);
+  font-size: .875em;
+  background: var(--acento-fraco);
+  color: var(--acento);
+  padding: .12em .38em;
+  border-radius: var(--raio-p);
+}
+
+pre {
+  margin: 0;
+  padding: var(--e4);
+  background: var(--superficie-baixa);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+}
+pre code { background: none; color: var(--texto); padding: 0; font-size: inherit; }
+
+ul, ol { margin: 0; padding-left: 1.35em; display: flex; flex-direction: column; gap: var(--e2); }
+li::marker { color: var(--texto-fraco); }
+
+hr { border: none; border-top: 1px solid var(--borda); margin: 0; }
+
+/* ---------------------------------------------------------------- topo */
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e3);
+  padding-bottom: var(--e5);
+  border-bottom: 1px solid var(--borda);
+}
+.marca { display: flex; align-items: center; gap: var(--e3); }
+.marca::before {
+  content: "";
+  width: 26px; height: 26px; flex: 0 0 auto;
+  border-radius: 7px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230F1621'/%3E%3Crect x='6' y='19' width='20' height='5' rx='2' fill='%234CA8FF'/%3E%3Crect x='9' y='9' width='14' height='3' rx='1.5' fill='%23E6EDF5'/%3E%3C/svg%3E") center / cover no-repeat;
+  box-shadow: var(--sombra-1);
+}
+
+/* --------------------------------------------------------------- veredito */
+
+/* O bloco de abertura é a tese do documento: a resposta vem antes do
+   raciocínio, porque é ela que decide se vale ler o resto. */
+.veredito {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e3);
+  padding: var(--e5);
+  background: var(--superficie);
+  border: 1px solid var(--borda-forte);
+  border-left: 4px solid var(--alerta);
+  border-radius: var(--raio-g);
+  box-shadow: var(--sombra-2);
+}
+.veredito h2 { font-size: 20px; }
+.veredito p { max-width: none; }
+
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e2);
+  align-self: flex-start;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: .02em;
+  border: 1px solid currentColor;
+}
+.selo::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.selo-nao    { color: var(--erro);   background: var(--erro-bg); }
+.selo-sim    { color: var(--ok);     background: var(--ok-bg); }
+.selo-parcial{ color: var(--alerta); background: var(--alerta-bg); }
+
+/* ---------------------------------------------------------------- cartões */
+
+.cartao {
+  padding: var(--e5);
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-g);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e3);
+}
+.cartao h3 { display: flex; align-items: center; gap: var(--e2); }
+
+.aviso {
+  position: relative;
+  padding: var(--e4) var(--e4) var(--e4) var(--e5);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--superficie-baixa);
+  font-size: 15px;
+}
+.aviso::before {
+  content: "";
+  position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  border-radius: var(--raio) 0 0 var(--raio);
+  background: var(--texto-fraco);
+}
+.aviso p { max-width: none; }
+.aviso-erro   { background: var(--erro-bg);   border-color: color-mix(in srgb, var(--erro) 34%, var(--borda)); }
+.aviso-erro::before   { background: var(--erro); }
+.aviso-ok     { background: var(--ok-bg);     border-color: color-mix(in srgb, var(--ok) 34%, var(--borda)); }
+.aviso-ok::before     { background: var(--ok); }
+.aviso-alerta { background: var(--alerta-bg); border-color: color-mix(in srgb, var(--alerta) 34%, var(--borda)); }
+.aviso-alerta::before { background: var(--alerta); }
+
+/* ---------------------------------------------------------------- tabela */
+
+.rolagem { overflow-x: auto; border: 1px solid var(--borda); border-radius: var(--raio); }
+table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14.5px; }
+th, td { padding: 11px var(--e3); text-align: left; vertical-align: top; border-bottom: 1px solid var(--borda); }
+th {
+  background: var(--superficie-alta);
+  font-size: 11px; font-weight: 650; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--texto-fraco);
+  white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: none; }
+td:first-child { font-weight: 600; }
+
+/* --------------------------------------------------------------- passos */
+
+/* Numeração aqui carrega informação: é uma sequência real de execução,
+   em que a ordem importa. Fora daqui, nada é numerado. */
+.passos { list-style: none; padding: 0; counter-reset: passo; gap: var(--e4); }
+.passos > li {
+  position: relative;
+  padding-left: var(--e7);
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e2);
+}
+.passos > li::before {
+  counter-increment: passo;
+  content: counter(passo);
+  position: absolute; left: 0; top: 0;
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  border-radius: 8px;
+  background: var(--acento);
+  color: var(--acento-texto);
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+}
+.passos > li > strong { font-size: 17px; }
+
+.rodape {
+  padding-top: var(--e5);
+  border-top: 1px solid var(--borda);
+  font-size: 13.5px;
+  color: var(--texto-suave);
+  display: flex; flex-direction: column; gap: var(--e3);
+}
+.rodape ol { font-size: 13.5px; }
+
+@media (max-width: 620px) {
+  .pagina { padding: var(--e6) var(--e4) var(--e7); gap: var(--e5); }
+  .cartao, .veredito { padding: var(--e4); }
+  .passos > li { padding-left: var(--e6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="pagina">
+
+<header class="cabecalho">
+  <div class="marca eyebrow">SyncLab · documento de apoio</div>
+  <h1>Como levar o áudio e a legenda do SyncLab para dentro do Genially</h1>
+  <p class="subtitulo">
+    O que a IA do Genially consegue fazer, o que ela não faz, e qual é o caminho
+    que preserva as três exigências: o aluno vê só a legenda, o áudio toca
+    sozinho, e a caixa tem o tamanho do texto.
+  </p>
+</header>
+
+<!-- ==================================================================== -->
+<section class="veredito">
+  <span class="selo selo-nao">A IA do Genially não constrói este componente</span>
+  <h2>A resposta curta, antes do raciocínio</h2>
+  <p>
+    A IA do Genially — tanto a geração de <em>geniallys</em> inteiros quanto o
+    <strong>AI Builder</strong> — monta componentes usando os elementos nativos
+    da própria plataforma, de forma conversacional e, nas palavras da Genially,
+    <strong>“sem tocar em código”</strong>. Ela cria roletas, caça-palavras,
+    linhas do tempo, jogos de associação. Ela <strong>não escreve HTML, CSS ou
+    JavaScript sob medida</strong>, e é exatamente isso que o receptor do
+    SyncLab precisa ser.
+  </p>
+  <p>
+    Some-se a isso um detalhe que decide a questão: o áudio nativo do Genially
+    <strong>entra mudo</strong> por política de navegador, e o aluno precisa
+    clicar no botão de som para ouvir. Isso quebra de uma vez as exigências 1 e
+    2 — apareceria um controle, e o áudio não tocaria sozinho.
+  </p>
+  <p>
+    O caminho que funciona é outro, e já está pronto: o <strong>elemento de
+    HTML/código do Genially</strong> recebendo o <strong>trecho inline</strong>
+    gerado pelo SyncLab. A IA do Genially continua útil neste fluxo — só que
+    para o slide em volta, não para o componente.
+  </p>
+</section>
+
+<!-- ==================================================================== -->
+<section class="secao">
+  <h2>O que a IA do Genially faz</h2>
+  <p>
+    Vale conhecer o alcance real dela, porque em outras partes do seu material
+    ela economiza muito trabalho.
+  </p>
+
+  <div class="rolagem">
+    <table>
+      <thead>
+        <tr><th>Recurso</th><th>O que faz</th><th>Serve para o nosso componente?</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Geração de genially com IA</td>
+          <td>Cria um rascunho completo — layout, conteúdo e interatividade — a partir de uma ideia, de um texto ou de um PDF.</td>
+          <td><span class="selo selo-nao">Não</span></td>
+        </tr>
+        <tr>
+          <td>AI Builder</td>
+          <td>Espaço conversacional que constrói componentes interativos prontos (roleta, caça-palavras, linha do tempo, associação) direto no canvas, sem código.</td>
+          <td><span class="selo selo-nao">Não</span></td>
+        </tr>
+        <tr>
+          <td>Assistente de escrita</td>
+          <td>Ajusta tom, corrige erros e simplifica a estrutura do texto dentro do editor.</td>
+          <td><span class="selo selo-sim">Sim — para o roteiro da narração</span></td>
+        </tr>
+        <tr>
+          <td>Geração e edição de imagem</td>
+          <td>Cria imagens livres de licença a partir de uma descrição; troca fundos, remove elementos, muda estilos.</td>
+          <td><span class="selo selo-sim">Sim — para o slide em volta</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="aviso aviso-alerta">
+    <p>
+      <strong>A fronteira que importa.</strong> Todo o material da Genially
+      descreve a IA como um caminho <em>sem código</em>. Esse é o argumento de
+      venda dela — e é justamente por isso que ela não é a ferramenta para um
+      componente cuja função inteira é código: sincronizar legenda com áudio,
+      insistir no autoplay e não desenhar nada além de uma linha de texto.
+    </p>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<section class="secao">
+  <h2>Por que o áudio nativo do Genially não resolve</h2>
+  <p>
+    Antes de partir para o elemento de código, vale entender por que o caminho
+    óbvio — inserir o MP3 como áudio do Genially e a legenda como caixas de
+    texto — não atende ao que você pediu.
+  </p>
+
+  <div class="cartao">
+    <h3><span class="selo selo-nao">Exigência 2</span> O áudio não tocaria sozinho</h3>
+    <p>
+      A documentação da Genially é explícita: por medidas de segurança dos
+      navegadores, o áudio entra <strong>mudo</strong> ao abrir a apresentação, e
+      é preciso clicar no botão de som para ouvir. A recomendação da própria
+      Genially é colocar áudios com autoplay <strong>a partir da segunda
+      página</strong> — ou seja, contando com um clique do aluno antes.
+    </p>
+  </div>
+
+  <div class="cartao">
+    <h3><span class="selo selo-nao">Exigência 1</span> Apareceria um controle</h3>
+    <p>
+      Se o som depende de um botão, o botão precisa existir e estar visível.
+      Isso contraria diretamente “o aluno vê apenas a linha da legenda”.
+    </p>
+  </div>
+
+  <div class="cartao">
+    <h3><span class="selo selo-nao">Sincronia</span> A legenda viraria trabalho manual</h3>
+    <p>
+      Legenda em caixas de texto com animação de entrada e saída significa
+      posicionar cada bloco na linha do tempo à mão. Qualquer ajuste no áudio
+      obriga a refazer tudo. O SyncLab já entrega o tempo exato de cada bloco;
+      jogar isso fora é o desperdício mais caro do processo.
+    </p>
+  </div>
+
+  <div class="aviso aviso-ok">
+    <p>
+      <strong>O que o trecho inline faz de diferente.</strong> Ele roda no mesmo
+      documento do slide, então enxerga os gestos do aluno; tenta tocar a cada
+      400&nbsp;ms em vez de desistir na primeira recusa; e, se o som for
+      bloqueado, toca mudo — o que nenhum navegador impede — para não perder a
+      sincronia, enquanto segue tentando devolver o som.
+    </p>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<section class="secao">
+  <h2>O caminho que funciona</h2>
+  <p>
+    A ordem abaixo importa: o nome do arquivo precisa estar definido antes de
+    gerar, e o áudio precisa estar hospedado antes de você colar o trecho.
+  </p>
+
+  <ol class="passos">
+    <li>
+      <strong>Gere no SyncLab e desligue o diagnóstico</strong>
+      <p>
+        Na seção 8, deixe <em>“Incluir o painel de diagnóstico”</em>
+        <strong>desmarcado</strong> para a versão do aluno. Ligue-o só enquanto
+        estiver investigando um problema.
+      </p>
+    </li>
+
+    <li>
+      <strong>Decida onde o áudio vai morar</strong>
+      <p>
+        <em>Embutido no HTML</em> é o padrão e não depende de nada externo — mas
+        o trecho fica grande (um áudio de 1&nbsp;MB vira cerca de 1,4&nbsp;MB de
+        texto), e editores costumam engasgar com isso.
+      </p>
+      <p>
+        <em>URL externa</em> deixa o trecho pequeno. Publique o MP3 na seção 9
+        do SyncLab e clique em <em>“Usar como URL do áudio”</em>. A URL
+        <strong>precisa</strong> ser <code>https</code>: o Genially não aceita
+        endereços <code>http</code>, e o navegador bloquearia o conteúdo misto
+        de qualquer forma.
+      </p>
+    </li>
+
+    <li>
+      <strong>Copie o trecho inline</strong>
+      <p>
+        Botão <em>“Copiar trecho”</em>. É o formato sem iframe — o que resolve o
+        autoplay. Não use o “HTML completo” aqui: ele existe para hospedar como
+        arquivo.
+      </p>
+    </li>
+
+    <li>
+      <strong>Insira o elemento de código no slide</strong>
+      <p>
+        No editor do Genially: <strong>Inserir</strong> (o botão <code>+</code>)
+        → <strong>Outros</strong> / <strong>Conteúdo externo</strong>, e escolha
+        a opção de inserir <strong>código HTML</strong>. Cole o trecho ali.
+      </p>
+    </li>
+
+    <li>
+      <strong>Posicione e teste como aluno</strong>
+      <p>
+        O elemento pode ficar pequeno e fora do caminho: a legenda se posiciona
+        sozinha na tela, pela ancoragem escolhida na seção 6 do SyncLab, e não
+        pelo tamanho da caixa no canvas.
+      </p>
+      <p>
+        Teste sempre pelo <strong>link de visualização publicado</strong>, nunca
+        pelo editor. O editor é um ambiente diferente, e o comportamento de
+        autoplay ali não prova nada.
+      </p>
+    </li>
+  </ol>
+</section>
+
+<!-- ==================================================================== -->
+<section class="secao">
+  <h2>Onde a IA do Genially ajuda de verdade neste fluxo</h2>
+  <p>
+    Ela não constrói o componente, mas encurta o trabalho em volta dele. Um
+    pedido possível para o AI Builder, já escrito para colar:
+  </p>
+  <pre><code>Crie um slide de aula de cardiologia com:
+- um título curto no topo;
+- uma ilustração de um eletrocardiograma à esquerda;
+- três pontos-chave à direita, em tópicos curtos;
+- a metade inferior do slide livre, sem nenhum elemento,
+  reservada para uma legenda que vai entrar por fora.
+Paleta sóbria, fundo escuro, texto claro.</code></pre>
+  <p>
+    O detalhe que faz diferença é o penúltimo item: pedir a área livre onde a
+    legenda vai aparecer evita que ela caia por cima de um elemento do slide.
+  </p>
+  <p>
+    O assistente de escrita também serve para o texto que você vai colar na
+    seção 2 do SyncLab — ajustar tom e simplificar frases antes de gerar o
+    áudio sai mais barato do que regerar depois.
+  </p>
+</section>
+
+<!-- ==================================================================== -->
+<section class="secao">
+  <h2>Quando algo não funcionar</h2>
+  <p>
+    Ligue o painel de diagnóstico na seção 8, gere de novo e olhe dois campos
+    antes de qualquer outra coisa.
+  </p>
+
+  <div class="cartao">
+    <h3>Campo <code>contexto</code></h3>
+    <p>
+      Diz se o trecho está rodando na página principal ou dentro de um iframe, e
+      se a página pai é alcançável. Se aparecer <em>“dentro de um iframe |
+      página pai bloqueada (outra origem)”</em>, o Genially embrulhou o seu
+      conteúdo — e é por isso que o gesto do aluno na página de fora não chega
+      ao áudio de dentro. É a explicação mais comum para “não toca e ninguém
+      sabe por quê”.
+    </p>
+  </div>
+
+  <div class="cartao">
+    <h3>Campo <code>erro</code></h3>
+    <p>
+      <code>NotAllowedError</code> significa que o navegador recusou o som — o
+      plano B mudo deve estar ativo, e o campo <em>som</em> vai mostrar
+      <em>“mudo (fallback ativo)”</em>. Já
+      <code>MEDIA_ERR_SRC_NOT_SUPPORTED</code> aponta para a URL do áudio:
+      abra-a direto no navegador e veja se ela carrega. Use o botão
+      <em>“Testar URL”</em> da seção 8 para isso.
+    </p>
+  </div>
+
+  <div class="aviso aviso-alerta">
+    <p>
+      <strong>Se o áudio ficar preso no modo mudo</strong>, é porque o navegador
+      exige um gesto e nenhum aconteceu. Um clique em qualquer lugar do slide
+      libera o som — a escuta de interação já está no trecho. Em aulas onde o
+      aluno chega ao slide clicando (por um botão de avançar, por exemplo), o
+      gesto já aconteceu e o som entra direto. Esse é o argumento a favor da
+      recomendação da própria Genially de não colocar o áudio no primeiro slide.
+    </p>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<section class="secao">
+  <h2>Resumo em uma tabela</h2>
+  <div class="rolagem">
+    <table>
+      <thead>
+        <tr><th>Abordagem</th><th>Só a legenda</th><th>Autoplay</th><th>Sincronia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>IA do Genially monta o componente</td>
+          <td><span class="selo selo-nao">Não faz</span></td>
+          <td><span class="selo selo-nao">Não faz</span></td>
+          <td><span class="selo selo-nao">Não faz</span></td>
+        </tr>
+        <tr>
+          <td>Áudio nativo + texto animado</td>
+          <td><span class="selo selo-nao">Botão de som</span></td>
+          <td><span class="selo selo-nao">Entra mudo</span></td>
+          <td><span class="selo selo-parcial">Manual</span></td>
+        </tr>
+        <tr>
+          <td>Trecho inline do SyncLab</td>
+          <td><span class="selo selo-sim">Sim</span></td>
+          <td><span class="selo selo-sim">Com plano B mudo</span></td>
+          <td><span class="selo selo-sim">Automática</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<footer class="rodape">
+  <div class="aviso aviso-erro">
+    <p>
+      <strong>O que ainda não foi testado.</strong> Nada deste documento foi
+      verificado dentro do Genially — não tenho conta na plataforma. O
+      comportamento do trecho inline foi provado num Chromium de verdade, com
+      autoplay liberado e bloqueado, mas <em>fora</em> do Genially. Os pontos
+      sobre a IA e sobre o áudio nativo vêm da documentação da Genially, citada
+      abaixo. Trate o passo a passo como o plano mais bem fundamentado
+      disponível, e não como um roteiro já validado em produção.
+    </p>
+  </div>
+
+  <p><strong>Fontes consultadas</strong></p>
+  <ol>
+    <li><a href="https://genially.com/features/ai-builder/">Genially AI Builder</a> — componente interativo por conversa, sem código.</li>
+    <li><a href="https://blog.genially.com/en/create-interactive-components-with-ai/">How to create interactive components with AI</a> — tipos de componente que a IA monta.</li>
+    <li><a href="https://help.genially.com/how-to-create-with-genially-ai-builder-r1Ts5F2tl">How to create with Genially AI Builder</a> — uso do AI Builder.</li>
+    <li><a href="https://blog.genially.com/en/generate-a-genially-with-ai/">How to generate a genially with AI</a> — geração de rascunho completo.</li>
+    <li><a href="https://support.genial.ly/en/support/solutions/articles/80000497039-insert-background-audio-on-your-genially">Insert background audio on your genially</a> — áudio entra mudo; recomendação de usar a partir da segunda página.</li>
+    <li><a href="https://help.genially.com/en_us/insert-an-audio-from-your-device-in-genially-B1l3cPBno">Insert an audio from your device in Genially</a> — botão de som para ouvir.</li>
+    <li><a href="https://support.genial.ly/en/support/solutions/articles/80000497064-i-can-t-see-the-web-page-or-application-that-i-ve-embedded-in-genially">I can't see the web page or application that I've embedded in Genially</a> — exigência de <code>https</code> no conteúdo incorporado.</li>
+  </ol>
+  <p>
+    Consultei estas páginas por busca; os domínios da Genially recusam leitura
+    automatizada, então trabalhei com os resumos e trechos retornados, não com o
+    texto integral de cada artigo. Se algum detalhe da interface estiver
+    diferente hoje, o menu é o ponto mais provável de mudança — a política de
+    autoplay dos navegadores, não.
+  </p>
+</footer>
+
+</div>
+</body>
+</html>

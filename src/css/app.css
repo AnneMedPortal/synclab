@@ -320,6 +320,8 @@ main {
   padding: var(--e6) var(--e6) var(--e5);
 }
 
+.rodape a { color: var(--acento); text-underline-offset: 3px; }
+
 .rodape {
   grid-area: rodape;
   max-width: var(--conteudo-max);
