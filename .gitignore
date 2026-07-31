@@ -7,3 +7,6 @@ package-lock.json
 *.zip
 *.mp3
 teste-*.html
+
+# Pacote de arquivo unico gerado por ferramentas/empacotar.mjs
+synclab.html
