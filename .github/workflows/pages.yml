@@ -48,11 +48,36 @@ jobs:
           # Copia extra, num arquivo unico, para quem quiser levar offline.
           node ferramentas/empacotar.mjs site/synclab-arquivo-unico.html
 
+      # O token do Actions consegue publicar no Pages, mas nao consegue criar
+      # o site na primeira vez ("Resource not accessible by integration").
+      # Esse passo e uma vez so, no navegador. Sem esta checagem, a falha
+      # apareceria como um erro de API sem pista do que fazer.
+      - name: Conferir se o Pages esta ligado
+        run: |
+          codigo=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pages")
+
+          if [ "$codigo" = "404" ]; then
+            echo "::error title=Ligue o GitHub Pages uma vez::Settings -> Pages -> Build and deployment -> Source: GitHub Actions"
+            echo ""
+            echo "O GitHub Pages ainda nao foi ligado neste repositorio."
+            echo "Para ligar, uma unica vez:"
+            echo ""
+            echo "  1. https://github.com/${{ github.repository }}/settings/pages"
+            echo "  2. Em 'Build and deployment', no campo 'Source',"
+            echo "     escolha 'GitHub Actions'."
+            echo ""
+            echo "Depois disso, este workflow publica sozinho a cada push."
+            echo "Para publicar agora, sem esperar um novo push: aba Actions ->"
+            echo "'Publicar no GitHub Pages' -> 'Run workflow'."
+            exit 1
+          fi
+
+          echo "Pages ligado (HTTP $codigo). Seguindo para a publicacao."
+
       - uses: actions/configure-pages@v5
-        with:
-          # Liga o Pages na primeira execucao, sem precisar mexer nas
-          # configuracoes do repositorio a mao.
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:

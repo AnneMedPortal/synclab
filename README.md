@@ -19,7 +19,32 @@ Quase toda decisão técnica aqui existe por causa de uma dessas três. As três
 são verificadas automaticamente num navegador de verdade
 (`testes/navegador.mjs`).
 
-## Como usar
+## Onde abrir
+
+**https://annemedportal.github.io/synclab/** — publicado a cada push no branch
+padrão, pelo workflow em `.github/workflows/pages.yml`. Todas as nove seções
+funcionam ali, inclusive a conexão com a ElevenLabs e o envio para o S3.
+
+> **Antes do primeiro acesso, ligue o Pages uma vez.** O token do GitHub Actions
+> publica no Pages, mas não tem permissão para criar o site — esse passo é
+> manual, e só na primeira vez:
+>
+> 1. abra [Settings → Pages](https://github.com/AnneMedPortal/synclab/settings/pages);
+> 2. em **Build and deployment**, no campo **Source**, escolha **GitHub Actions**.
+>
+> Depois, em **Actions → Publicar no GitHub Pages → Run workflow**, para publicar
+> na hora sem esperar um novo push. Daí em diante é automático.
+
+A página é pública, como qualquer site no GitHub Pages. Isso não expõe nada seu:
+a chave de API e as credenciais da AWS são digitadas na hora, ficam apenas no
+seu navegador e vão direto para a ElevenLabs e para a AWS. Não há segredo
+algum no código.
+
+Há também uma cópia em arquivo único em
+`https://annemedportal.github.io/synclab/synclab-arquivo-unico.html`, para
+baixar e usar offline.
+
+## Como rodar na sua máquina
 
 Precisa ser servido por HTTP — o navegador só libera a API de criptografia
 (usada na assinatura do S3) e os módulos ES em `https://` ou `http://localhost`.
