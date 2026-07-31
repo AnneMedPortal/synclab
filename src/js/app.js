@@ -1071,6 +1071,43 @@ function ligarEventos() {
   });
 }
 
+/**
+ * Marca no menu lateral a secao que esta na tela. Sem isso, numa pagina
+ * longa como esta, o menu vira decoracao: mostra para onde ir, mas nunca
+ * onde se esta.
+ */
+function acompanharSecoes() {
+  var links = {};
+  todos('.atalhos a').forEach(function (a) {
+    links[a.getAttribute('href').slice(1)] = a;
+  });
+  var secoes = todos('main section.cartao');
+  if (!secoes.length || typeof IntersectionObserver !== 'function') return;
+
+  var visiveis = Object.create(null);
+
+  var observador = new IntersectionObserver(function (entradas) {
+    entradas.forEach(function (e) {
+      if (e.isIntersecting) visiveis[e.target.id] = e.intersectionRatio;
+      else delete visiveis[e.target.id];
+    });
+
+    // A secao ativa e a primeira visivel na ordem do documento, e nao a mais
+    // visivel: rolando devagar, a "mais visivel" fica trocando sozinha.
+    var ativa = null;
+    for (var i = 0; i < secoes.length; i++) {
+      if (visiveis[secoes[i].id] !== undefined) { ativa = secoes[i].id; break; }
+    }
+    for (var id in links) {
+      if (Object.prototype.hasOwnProperty.call(links, id)) {
+        links[id].classList.toggle('ativa', id === ativa);
+      }
+    }
+  }, { rootMargin: '-96px 0px -55% 0px', threshold: 0 });
+
+  secoes.forEach(function (s) { observador.observe(s); });
+}
+
 function iniciar() {
   preencherFontes();
   restaurarPreferencias();
@@ -1080,6 +1117,7 @@ function iniciar() {
   atualizarPrevia();
   atualizarBotoesDeSaida();
   acompanharPrevia();
+  acompanharSecoes();
   $('ap-opacidade-valor').textContent = $('ap-opacidade').value;
   $('contagem-texto').textContent = $('texto').value.length + ' caracteres';
   $('url-audio').disabled = $('modo-audio').value !== 'url';

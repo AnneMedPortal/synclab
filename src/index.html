@@ -22,22 +22,22 @@
 </header>
 
 <nav class="atalhos" aria-label="Seções">
-  <a href="#sec-conexao">1. Conexão</a>
-  <a href="#sec-narracao">2. Narração</a>
-  <a href="#sec-legenda">3. Legenda</a>
-  <a href="#sec-dicionario">4. Dicionário</a>
-  <a href="#sec-regras">5. Segmentação</a>
-  <a href="#sec-aparencia">6. Aparência</a>
-  <a href="#sec-previa">7. Prévia</a>
-  <a href="#sec-saida">8. Saída</a>
-  <a href="#sec-s3">9. S3</a>
+  <a href="#sec-conexao">Conexão</a>
+  <a href="#sec-narracao">Narração</a>
+  <a href="#sec-legenda">Legenda</a>
+  <a href="#sec-dicionario">Dicionário</a>
+  <a href="#sec-regras">Segmentação</a>
+  <a href="#sec-aparencia">Aparência</a>
+  <a href="#sec-previa">Prévia</a>
+  <a href="#sec-saida">Saída</a>
+  <a href="#sec-s3">S3</a>
 </nav>
 
 <main>
 
 <!-- ================================================================= -->
 <section class="cartao" id="sec-conexao">
-  <h2>1. Conexão com a ElevenLabs</h2>
+  <h2><span class="indice">1</span>Conexão com a ElevenLabs</h2>
   <p class="ajuda">
     A chave é usada direto do seu navegador para a ElevenLabs. Nada passa por
     servidor intermediário. Espaços e caracteres invisíveis colados junto são
@@ -96,7 +96,7 @@
 
 <!-- ================================================================= -->
 <section class="cartao" id="sec-narracao">
-  <h2>2. Narração e nome dos arquivos</h2>
+  <h2><span class="indice">2</span>Narração e nome dos arquivos</h2>
 
   <label class="campo">
     <span>Nome-base dos arquivos <em>(definido antes de gerar)</em></span>
@@ -117,7 +117,7 @@
 
 <!-- ================================================================= -->
 <section class="cartao" id="sec-legenda">
-  <h2>3. Origem da legenda</h2>
+  <h2><span class="indice">3</span>Origem da legenda</h2>
 
   <div class="abas" role="tablist">
     <button type="button" class="aba ativa" data-origem="texto" role="tab">Texto → ElevenLabs</button>
@@ -172,7 +172,7 @@
 
 <!-- ================================================================= -->
 <section class="cartao" id="sec-dicionario">
-  <h2>4. Dicionário de pronúncia</h2>
+  <h2><span class="indice">4</span>Dicionário de pronúncia</h2>
   <p class="ajuda">
     Para siglas e jargão médico que a voz lê errado. O dicionário é salvo na sua
     conta da ElevenLabs e aplicado nas gerações seguintes.
@@ -233,7 +233,7 @@
 
 <!-- ================================================================= -->
 <section class="cartao" id="sec-regras">
-  <h2>5. Regras de segmentação</h2>
+  <h2><span class="indice">5</span>Regras de segmentação</h2>
 
   <div class="linha">
     <label class="campo">
@@ -266,7 +266,7 @@
 
 <!-- ================================================================= -->
 <section class="cartao" id="sec-aparencia">
-  <h2>6. Aparência da legenda</h2>
+  <h2><span class="indice">6</span>Aparência da legenda</h2>
 
   <div class="linha">
     <label class="campo">
@@ -377,7 +377,7 @@
 
 <!-- ================================================================= -->
 <section class="cartao" id="sec-previa">
-  <h2>7. Pré-visualização</h2>
+  <h2><span class="indice">7</span>Pré-visualização</h2>
   <p class="ajuda">
     O fundo xadrez confirma a transparência: o que você vê como xadrez, o aluno
     vê como o slide do Genially. Este player existe só aqui — no HTML exportado
@@ -385,6 +385,7 @@
   </p>
 
   <div class="previa-moldura">
+    <div class="previa-barra"><span class="previa-ponto"></span>Prévia do slide</div>
     <div class="xadrez" id="palco-previa">
       <div id="previa-raiz" class="previa-raiz">
         <div id="previa-caixa" class="previa-caixa" data-visivel="0"></div>
@@ -410,7 +411,7 @@
 
 <!-- ================================================================= -->
 <section class="cartao" id="sec-saida">
-  <h2>8. Saída</h2>
+  <h2><span class="indice">8</span>Saída</h2>
 
   <div class="linha">
     <label class="campo">
@@ -468,7 +469,7 @@
 
 <!-- ================================================================= -->
 <section class="cartao" id="sec-s3">
-  <h2>9. Hospedagem no S3</h2>
+  <h2><span class="indice">9</span>Hospedagem no S3</h2>
   <p class="ajuda">
     Envio direto do navegador, assinado com AWS SigV4. Os objetos vão com
     <code>Cache-Control: no-store</code>, para que republicar apareça atualizado

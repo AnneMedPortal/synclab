@@ -33,6 +33,10 @@ python3 -m http.server 8000
 
 Ou publique o conteúdo de `src/` em qualquer hospedagem estática.
 
+A interface acompanha o tema claro ou escuro do sistema, e o menu lateral vira
+uma faixa de atalhos em telas estreitas. Nenhuma fonte ou folha de estilo é
+baixada de fora: a ferramenta funciona offline depois de carregada.
+
 ### O caminho normal
 
 1. **Conexão** — cole a chave da ElevenLabs e clique em *Conectar*. As vozes e
