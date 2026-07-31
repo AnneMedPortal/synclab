@@ -1,0 +1,62 @@
+name: Publicar no GitHub Pages
+
+# Publica o conteudo de src/ como site estatico. O SyncLab roda inteiro no
+# navegador, entao nao ha nada para construir: o site e a propria pasta src/.
+#
+# Diferente da previa em Artifact, aqui nao ha politica bloqueando chamadas de
+# rede -- as secoes de ElevenLabs e S3 funcionam normalmente.
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Uma publicacao por vez, sem cancelar a que ja esta em andamento.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    # So o branch padrao vira site. Comparar com default_branch em vez de
+    # fixar um nome mantem isto valido se o branch for renomeado ou trocado.
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.publicacao.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Nao publicar uma versao quebrada: a suite roda sem dependencias.
+      - name: Conferir a logica pura
+        run: node testes/executar.mjs
+
+      - name: Preparar o site
+        run: |
+          mkdir -p site
+          cp -R src/. site/
+          # Copia extra, num arquivo unico, para quem quiser levar offline.
+          node ferramentas/empacotar.mjs site/synclab-arquivo-unico.html
+
+      - uses: actions/configure-pages@v5
+        with:
+          # Liga o Pages na primeira execucao, sem precisar mexer nas
+          # configuracoes do repositorio a mao.
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - id: publicacao
+        uses: actions/deploy-pages@v4
